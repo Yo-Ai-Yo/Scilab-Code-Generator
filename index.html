@@ -83,7 +83,7 @@
       const [query, setQuery] = useState("");
       const [generatedCode, setGeneratedCode] = useState("");
       const [error, setError] = useState("");
-      const [darkMode, setDarkMode] = useState(true); // Default to dark mode for black theme
+      const [darkMode, setDarkMode] = useState(true);
       const [codeHistory, setCodeHistory] = useState([]);
       const [showHistory, setShowHistory] = useState(false);
       const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -147,7 +147,7 @@
           return;
         }
         setError("");
-        setGeneratedCode(""); // Clear previous code while generating
+        setGeneratedCode("");
         const prompt = `Generate Scilab code for the following request: "${query}". Provide only the code without additional explanations.`;
         const code = await callAwanApi(prompt);
         if (code) {
@@ -158,9 +158,9 @@
           };
           setCodeHistory([...codeHistory, newEntry]);
           setGeneratedCode(code);
-          setQuery(""); // Clear the input
+          setQuery("");
         }
-        setSidebarOpen(false); // Close sidebar on mobile
+        setSidebarOpen(false);
       };
 
       // Export code history
@@ -184,6 +184,15 @@
         localStorage.removeItem("codeHistory");
         setShowHistory(false);
         setSidebarOpen(false);
+      };
+
+      // Copy code to clipboard
+      const copyCode = (code) => {
+        navigator.clipboard.writeText(code).then(() => {
+          alert("Code copied to clipboard!");
+        }).catch(() => {
+          alert("Failed to copy code.");
+        });
       };
 
       return (
@@ -282,10 +291,18 @@
               {/* Generated Code */}
               {generatedCode && (
                 <div className="glass p-6 mb-4 fade-in-scale">
-                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-gray-200">
-                    Generated Scilab Code
-                  </h3>
-                  <pre className="text-sm md:text-base"><code>{generatedCode}</code></pre>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-lg md:text-xl font-semibold text-gray-200">
+                      Generated Scilab Code
+                    </h3>
+                    <button
+                      onClick={() => copyCode(generatedCode)}
+                      className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-sm md:text-base"
+                    >
+                      Copy Code
+                    </button>
+                  </div>
+                  <pre className="text-sm md:text-base">{generatedCode}</pre>
                 </div>
               )}
             </div>
@@ -313,11 +330,19 @@
                 ) : (
                   codeHistory.map((entry, index) => (
                     <div key={index} className="mb-4 p-4 bg-gray-800 rounded-lg">
-                      <p className="text-sm text-gray-400">{entry.timestamp}</p>
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-400">{entry.timestamp}</p>
+                        <button
+                          onClick={() => copyCode(entry.code)}
+                          className="bg-gray-700 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition text-sm"
+                        >
+                          Copy Code
+                        </button>
+                      </div>
                       <p className="font-semibold text-gray-200">
                         Query: {entry.query}
                       </p>
-                      <pre className="text-sm md:text-base"><code>{entry.code}</code></pre>
+                      <pre className="text-sm md:text-base">{entry.code}</pre>
                     </div>
                   ))
                 )}
