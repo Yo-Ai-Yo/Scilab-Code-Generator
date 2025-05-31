@@ -148,7 +148,7 @@
         }
         setError("");
         setGeneratedCode("");
-        const prompt = `Generate Scilab code for the following request: "${query}". Provide only the code without additional explanations.`;
+        const prompt = `Generate Scilab code for the following request: "${query}". Provide only the code without any markdown, labels, or formatting. Do not include triple backticks, 'Scilab', or any extra text before or after the code. Output must be clean and directly executable in Scilab.`;
         const code = await callAwanApi(prompt);
         if (code) {
           const newEntry = {
